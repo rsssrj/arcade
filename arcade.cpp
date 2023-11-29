@@ -2,10 +2,11 @@
 #include <cmath>
 
 const float circleRadius = 20.0f;  // Specify the radius in pixels
-//const float mouseMoveScale = 10.0f;
 
 float circleX = 0.0f;
 float circleY = 0.0f;
+
+const float velocity = 3.0f;
 
 void drawCircle(float cx, float cy, float r, int num_segments) {
     glBegin(GL_POLYGON);
@@ -27,24 +28,31 @@ void display() {
     glutSwapBuffers();
 }
 
-
 void mouseMotion(int x, int y) {
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
     // Convert mouse coordinates to OpenGL coordinates
-    circleX = (x - windowWidth / 2.0f);
-    circleY = (windowHeight / 2.0f - y);
+    float targetX = (x - windowWidth / 2.0f);
+    float targetY = (windowHeight / 2.0f - y);
 
-    // Apply bounds to keep the circle within a reasonable area
-    float maxX = windowWidth / 2.0f - circleRadius;
-    float maxY = windowHeight / 2.0f - circleRadius;
-    float minX = -windowWidth / 2.0f + circleRadius;
-    float minY = -windowHeight / 2.0f + circleRadius;
+    // Calculate the direction vector
+    float directionX = targetX - circleX;
+    float directionY = targetY - circleY;
 
-    if (circleX > maxX) circleX = maxX;
-    if (circleX < minX) circleX = minX;
-    if (circleY > maxY) circleY = maxY;
-    if (circleY < minY) circleY = minY;
+    // Calculate the distance to the target
+    float distance = sqrt(directionX * directionX + directionY * directionY);
+
+    // Check if the distance is not zero
+    if (distance > 0) {
+        // Normalize the direction vector
+        directionX /= distance;
+        directionY /= distance;
+
+        // Move the circle with constant velocity in the direction of the cursor
+        circleX += directionX * velocity;
+        circleY += directionY * velocity;
+    }
 
     glutPostRedisplay(); // Trigger a redraw
 }
