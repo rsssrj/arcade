@@ -1,60 +1,46 @@
 #include <GL/glut.h>
-#include <cmath>
+#include "npc.h"
+#include "player.h"
 
-const float circleRadius = 20.0f;  // Specify the radius in pixels
 
-float circleX = 0.0f;
-float circleY = 0.0f;
+player playerBlob(0.0f, 0.0f, 2.0f);
+std::vector<NPC> npcs;
 
-const float velocity = 3.0f;
+void initializeNPCs() {
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
-void drawCircle(float cx, float cy, float r, int num_segments) {
-    glBegin(GL_POLYGON);
-    for (int i = 0; i < num_segments; i++) {
-        float theta = 2.0f * 3.1415926f * float(i) / float(num_segments);
-        float x = r * cosf(theta);
-        float y = r * sinf(theta);
-        glVertex2f(x + cx, y + cy);
+    // Create NPC blobs with random positions and velocities
+    for (int i = 0; i < 15; ++i) {
+        float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);  // Random X position between -width/2 and width/2
+        float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);  // Random Y position between -height/2 and height/2
+        float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;  // Random velocity between 1 and 3
+        npcs.emplace_back(startX, startY, startVelocity);
     }
-    glEnd();
 }
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Draw the moving circle with a fixed radius in pixels
-    drawCircle(circleX, circleY, circleRadius, 100);
+    // Render the player blob
+    playerBlob.display();
+
+    // Render each NPC in the collection
+    for (const auto& npc : npcs) {
+        npc.display();
+    }
 
     glutSwapBuffers();
 }
 
-void mouseMotion(int x, int y) {
-    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
-    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-
-    // Convert mouse coordinates to OpenGL coordinates
-    float targetX = (x - windowWidth / 2.0f);
-    float targetY = (windowHeight / 2.0f - y);
-
-    // Calculate the direction vector
-    float directionX = targetX - circleX;
-    float directionY = targetY - circleY;
-
-    // Calculate the distance to the target
-    float distance = sqrt(directionX * directionX + directionY * directionY);
-
-    // Check if the distance is not zero
-    if (distance > 0) {
-        // Normalize the direction vector
-        directionX /= distance;
-        directionY /= distance;
-
-        // Move the circle with constant velocity in the direction of the cursor
-        circleX += directionX * velocity;
-        circleY += directionY * velocity;
+void timer(int value) {
+    // Move each NPC randomly
+    for (auto& npc : npcs) {
+        npc.moveRandomly(16);
     }
 
-    glutPostRedisplay(); // Trigger a redraw
+    glutPostRedisplay();
+    glutTimerFunc(16, timer, 0);  // 60 FPS update rate
 }
 
 void reshape(int width, int height) {
@@ -65,13 +51,22 @@ void reshape(int width, int height) {
     glMatrixMode(GL_MODELVIEW);
 }
 
+void mouseMotion(int x, int y) {
+    playerBlob.moveMouse(x, y);
+    //glutPostRedisplay(); // Trigger a redraw
+}
+
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-    glutCreateWindow("Move Circle with Mouse");
+    glutCreateWindow("Blob Game");
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    glutPassiveMotionFunc(mouseMotion); // Use passive motion callback to track mouse movement without button press
+    glutPassiveMotionFunc(mouseMotion);  // Use passive motion callback to track mouse movement without button press
+
+    initializeNPCs();  // Initialize the collection of NPC blobs
+
+    glutTimerFunc(0, timer, 0);  // Start the update timer
+    srand(static_cast<unsigned>(time(0)));  // Seed the random number generator
     glutMainLoop();
-    return 0;
 }

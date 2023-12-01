@@ -1,4 +1,5 @@
-CXXFLAGS = -g -std=c++17 -lGL -lGLU -lglut 
+CXXFLAGS = -g -std=c++17  
+LIBS = -lGL -lGLU -lglut
 CXX      = g++
 
 # These targets don't create any files:
@@ -12,9 +13,15 @@ CXX      = g++
 
 all: arcade
 
-arcade: arcade.o
-	$(CXX) $(CXXFLAGS) -o $@ $+
-arcade.o: arcade.cpp
+arcade: arcade.o npc.o player.o blob.o
+	$(CXX) $(CXXFLAGS) -o $@ $+ $(LIBS)
+arcade.o: arcade.cpp npc.h player.h
+	$(CXX) $(CXXFLAGS) -c $<
+player.o: player.cpp player.h blob.h
+	$(CXX) $(CXXFLAGS) -c $<
+npc.o: npc.cpp npc.h blob.h
+	$(CXX) $(CXXFLAGS) -c $<
+blob.o: blob.cpp blob.h
 	$(CXX) $(CXXFLAGS) -c $<
 clean:
 	rm -f arcade *.o
