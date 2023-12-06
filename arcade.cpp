@@ -23,7 +23,7 @@ void initializeNPCs() {
         float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
         float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
         float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
-        float startSize = 10.0f;  // Set the initial size for NPCs
+        float startSize = static_cast<float>(rand() % 20.0f + 5);  // Set the initial size for NPCs
         npcs.emplace_back(startX, startY, startVelocity, startSize);
     }
 }
