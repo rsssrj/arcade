@@ -42,6 +42,7 @@ void player::moveMouse(int x, int y) {
             size += it->size;
 
             // Remove the eaten NPC from the collection
+            addBlob(it->size * 1.25);
             it = npcs.erase(it);
         } else {
             ++it; // Move to the next NPC
@@ -50,4 +51,15 @@ void player::moveMouse(int x, int y) {
 
     glutPostRedisplay(); // Trigger a redraw
 }
+
+void player::addBlob(float size)
+{
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
+    float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
+    float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
+    npcs.emplace_back(startX, startY, startVelocity, size);
+}
+
 

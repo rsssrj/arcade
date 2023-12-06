@@ -14,6 +14,7 @@ public:
 
     // Function to handle player movement based on mouse input
     void moveMouse(int x, int y);
+    void addBlob(float size);
 };
 
 #endif // PLAYER_H
