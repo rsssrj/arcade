@@ -16,6 +16,7 @@ public:
     void moveMouse(int x, int y);
     void addBlob(float size);
     bool isGameOver();
+    void setGameOver(bool x);
 private: 
     bool gameOver = false;
 };

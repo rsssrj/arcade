@@ -44,13 +44,13 @@ void player::moveMouse(int x, int y) {
             // Player ate the NPC, increase player size
             size += (it->size * 0.1);
 
-            // Remove the eaten NPC from the collection
+            // Remove the eaten NPC from the collection and add a bigger NPC
             addBlob(it->size * 1.25);
             it = npcs.erase(it);
             }
             else
             {
-                gameOver = false;
+                gameOver = true;
             }
         } else {
             ++it; // Move to the next NPC
@@ -75,4 +75,7 @@ bool player::isGameOver()
     return gameOver;
 }
 
-
+void player::setGameOver(bool x)
+{
+    gameOver = x;
+}

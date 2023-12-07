@@ -5,8 +5,7 @@
 #include <cmath>
 #include "npc.h"
 #include "player.h"
-
-
+#include <iostream>
 
 player playerBlob(0.0f, 0.0f, 2.0f, 10.0f);  // Provide a value for startSize, e.g., 1.0f
 
@@ -49,9 +48,10 @@ void drawTimer() {
 
 void endScreen()
 {
+    std::cout <<  "end" << std::endl;
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-    glClear(GL_COLOR_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 0.0, 0.0); // Red color
 
     // Position to start drawing the text
@@ -70,8 +70,12 @@ void endScreen()
 
 
 void display() {
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     if (playerBlob.isGameOver())
+    {
+        blinkTimer = true;
         endScreen();
+    }
     else
     {
 
@@ -110,7 +114,7 @@ void timer(int value) {
     // Check if 60 seconds have passed
     if (elapsedTime >= 60 * 60) {  // 60 seconds * 60 frames per second
         // Exit the program
-        exit(0);
+        playerBlob.setGameOver(true);
     }
 
     glutPostRedisplay();
@@ -128,7 +132,7 @@ void reshape(int width, int height) {
 
 void mouseMotion(int x, int y) {
     playerBlob.moveMouse(x, y);
-    //glutPostRedisplay(); // Trigger a redraw
+    glutPostRedisplay(); // Trigger a redraw
 }
 
 int main(int argc, char** argv) {
