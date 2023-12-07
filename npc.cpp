@@ -1,14 +1,23 @@
 #include <GL/glut.h>
 #include <cmath>
 #include "npc.h"
+#include "player.h"
 
-void NPC::moveRandomly(int deltaTime) {
+extern player playerBlob;
+
+
+void NPC::moveRandomly(player& playerBlob, int deltaTime) {
     moveTimer -= deltaTime;
 
     if (moveTimer <= 0) {
-        randomAngle = static_cast<float>(rand() % 360);
+        // Calculate the direction vector towards the player
+        float deltaX = playerBlob.x - x;
+        float deltaY = playerBlob.y - y;
 
-        // Calculate the movement components based on the random angle
+        // Calculate the angle
+        randomAngle = atan2(deltaY, deltaX) * 180.0f / 3.1415926f;
+
+        // Calculate the movement components based on the angle
         moveTimer = moveDuration;
     }
 
@@ -28,4 +37,19 @@ void NPC::moveRandomly(int deltaTime) {
 
     // Update the NPC's position
     move(deltaX, deltaY, deltaTime);
+
+    // Check for collisions with other NPCs
+    for (auto& otherNPC : npcs) {
+        if (&otherNPC != this && checkCollision(otherNPC)) {
+            if (size > otherNPC.size) {
+                // This NPC ate the other NPC
+                size += otherNPC.size * 0.5f;  // Adjust the growth percentage
+                otherNPC.size = 0;  // Mark the other NPC as eaten
+            } else if (size < otherNPC.size) {
+                // This NPC got eaten by the other NPC
+                otherNPC.size += size * 0.5f;  // Adjust the growth percentage
+                size = 0;  // Mark this NPC as eaten
+            }
+        }
+    }
 }

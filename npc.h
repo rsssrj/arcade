@@ -1,12 +1,14 @@
 #ifndef NPC_H
 #define NPC_H
 
+class player;  // Forward declaration
+
 #include "blob.h"
 
 class NPC : public blob {
 private:
-    int moveTimer;     // Timer to control how long the NPC moves in a certain direction
-    int moveDuration;  // How long the NPC should move in a certain direction (in milliseconds)
+    int moveTimer;
+    int moveDuration;
     float randomAngle;
 
 public:
@@ -16,8 +18,7 @@ public:
         moveTimer = 0;
     }
 
-    // Function to make NPC move randomly
-    void moveRandomly(int deltaTime);
+    void moveRandomly(player& playerBlob, int deltaTime);
 };
 
 #endif // NPC_H

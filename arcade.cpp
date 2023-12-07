@@ -8,7 +8,7 @@
 
 
 
-player playerBlob(0.0f, 0.0f, 2.0f, 10.0f);  // Provide a value for startSize, e.g., 1.0f
+player playerBlob(0.0f, 0.0f, 2.0f, 10.0f); // Provide a value for startSize, e.g., 1.0f
 
 int elapsedTime = 0;         // Elapsed time in seconds
 bool blinkTimer = false;      // Flag to control blinking
@@ -74,10 +74,26 @@ void display() {
 
 
 void timer(int value) {
-    // Move each NPC randomly
+    // Move each NPC randomly and check for collisions
     for (auto& npc : npcs) {
-        npc.moveRandomly(16);
+        npc.moveRandomly(playerBlob, 16);
+
+        // Check for collisions with other NPCs
+        for (auto& otherNPC : npcs) {
+            if (&otherNPC != &npc && npc.checkCollision(otherNPC)) {
+                if (npc.size > otherNPC.size) {
+                    // This NPC ate the other NPC
+                    npc.size += otherNPC.size * 0.5f;  // Adjust the growth percentage
+                    otherNPC.size = 0;  // Mark the other NPC as eaten
+                } else if (npc.size < otherNPC.size) {
+                    // This NPC got eaten by the other NPC
+                    otherNPC.size += npc.size * 0.5f;  // Adjust the growth percentage
+                    npc.size = 0;  // Mark this NPC as eaten
+                }
+            }
+        }
     }
+
 
     // Update the elapsed time
     elapsedTime++;
@@ -124,4 +140,3 @@ int main(int argc, char** argv) {
     srand(static_cast<unsigned>(time(0)));
     glutMainLoop();
 }
-

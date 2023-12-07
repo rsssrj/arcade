@@ -3,7 +3,7 @@
 #include "player.h"
 #include "npc.h"  // Include the header file for NPC
 
-const float velocity = 3.0f;
+const float velocity = 60.0f;
 const float initialSize = 1.0f;  // Initial size of the player blob
 
 // Declare the npcs vector
@@ -38,18 +38,24 @@ void player::moveMouse(int x, int y) {
     // Check for collisions with NPC blobs
     for (auto it = npcs.begin(); it != npcs.end();) {
         if (it->checkCollision(*this)) {
-            // Player ate the NPC, increase player size by a percentage of NPC size
-            float growthPercentage = 0.15f;  // Adjust this value as needed
-            size += it->size * growthPercentage;
+            if (it->size > size) {
+                // Player blob is eaten by a larger NPC, end the game
+                exit(0);
+            } else {
+                // Player ate the NPC, increase player size by a percentage of NPC size
+                float growthPercentage = 0.15f;  // Adjust this value as needed
+                size += it->size * growthPercentage;
 
-            // Remove the eaten NPC from the collection
-            addBlob(it->size * 1.25);
-            it = npcs.erase(it);
+                // Remove the eaten NPC from the collection
+                addBlob(it->size * 1.25);
+                it = npcs.erase(it);
+            }
         } else {
             ++it; // Move to the next NPC
         }
     }
     
+
 
     glutPostRedisplay(); // Trigger a redraw
 }
@@ -63,3 +69,4 @@ void player::addBlob(float size)
     float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
     npcs.emplace_back(startX, startY, startVelocity, size);
 }
+
