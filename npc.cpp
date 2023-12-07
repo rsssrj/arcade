@@ -11,7 +11,7 @@ void NPC::moveRandomly(int deltaTime) {
         // Calculate the movement components based on the random angle
         moveTimer = moveDuration;
     }
-    
+
     float windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     float windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
@@ -22,7 +22,6 @@ void NPC::moveRandomly(int deltaTime) {
     if (y < -windowHeight / 2.0f || y > windowHeight / 2.0f) {
         randomAngle = -randomAngle;  // Reverse the angle to bounce back
     }
-
 
     float deltaX = velocity * cosf(randomAngle);
     float deltaY = velocity * sinf(randomAngle);

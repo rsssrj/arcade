@@ -12,8 +12,7 @@ void blob::display() const {
     glTranslatef(x, y, 0.0f);
 
     // Increase the size of the blob (adjust the scaling factor as needed)
-    const float scale = 10.0f;
-    glScalef(scale, scale, 1.0f);
+    glScalef(size, size, 1.0f);
 
     glBegin(GL_TRIANGLE_FAN);
     glVertex2f(0.0f, 0.0f);  // Center of the circle
@@ -24,4 +23,9 @@ void blob::display() const {
     glEnd();
 
     glPopMatrix();
+}
+
+bool blob::checkCollision(const blob& other) const {
+    float distance = sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+    return distance < (size + other.size);
 }
