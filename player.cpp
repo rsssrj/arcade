@@ -38,8 +38,9 @@ void player::moveMouse(int x, int y) {
     // Check for collisions with NPC blobs
     for (auto it = npcs.begin(); it != npcs.end();) {
         if (it->checkCollision(*this)) {
-            // Player ate the NPC, increase player size
-            size += it->size;
+            // Player ate the NPC, increase player size by a percentage of NPC size
+            float growthPercentage = 0.15f;  // Adjust this value as needed
+            size += it->size * growthPercentage;
 
             // Remove the eaten NPC from the collection
             addBlob(it->size * 1.25);
@@ -48,6 +49,7 @@ void player::moveMouse(int x, int y) {
             ++it; // Move to the next NPC
         }
     }
+    
 
     glutPostRedisplay(); // Trigger a redraw
 }
