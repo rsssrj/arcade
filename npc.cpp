@@ -17,7 +17,7 @@ void NPC::moveRandomly(player& playerBlob, int deltaTime) {
         // Calculate the angle
         randomAngle = atan2(deltaY, deltaX) * 180.0f / 3.1415926f;
 
-        // Calculate the movement components based on the angle
+        // Calculate the movement components based on the angle and increase speed
         moveTimer = moveDuration;
     }
 
@@ -32,12 +32,14 @@ void NPC::moveRandomly(player& playerBlob, int deltaTime) {
         randomAngle = -randomAngle;  // Reverse the angle to bounce back
     }
 
-    float deltaX = velocity * cosf(randomAngle);
-    float deltaY = velocity * sinf(randomAngle);
+    // Increase the speed of the NPCs by adjusting the velocity
+    float speedMultiplier = 2.0f;  // You can adjust this multiplier as needed
+    float deltaX = speedMultiplier * velocity * cosf(randomAngle);
+    float deltaY = speedMultiplier * velocity * sinf(randomAngle);
 
     // Update the NPC's position
     move(deltaX, deltaY, deltaTime);
-
+    
     // Check for collisions with other NPCs
     for (auto& otherNPC : npcs) {
         if (&otherNPC != this && checkCollision(otherNPC)) {
