@@ -38,12 +38,20 @@ void player::moveMouse(int x, int y) {
     // Check for collisions with NPC blobs
     for (auto it = npcs.begin(); it != npcs.end();) {
         if (it->checkCollision(*this)) {
+            if (size > it->size)
+            {
+
             // Player ate the NPC, increase player size
-            size += it->size;
+            size += (it->size * 0.1);
 
             // Remove the eaten NPC from the collection
             addBlob(it->size * 1.25);
             it = npcs.erase(it);
+            }
+            else
+            {
+                gameOver = false;
+            }
         } else {
             ++it; // Move to the next NPC
         }
@@ -60,6 +68,11 @@ void player::addBlob(float size)
     float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
     float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
     npcs.emplace_back(startX, startY, startVelocity, size);
+}
+
+bool player::isGameOver()
+{
+    return gameOver;
 }
 
 

@@ -15,6 +15,9 @@ public:
     // Function to handle player movement based on mouse input
     void moveMouse(int x, int y);
     void addBlob(float size);
+    bool isGameOver();
+private: 
+    bool gameOver = false;
 };
 
 #endif // PLAYER_H

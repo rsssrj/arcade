@@ -47,29 +47,54 @@ void drawTimer() {
 }
 
 
+void endScreen()
+{
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0, 0.0, 0.0); // Red color
 
+    // Position to start drawing the text
+    int x = windowWidth / 2 - 50;
+    int y = windowHeight / 2;
+
+    // Draw each character individually
+    const char* gameOverText = "Game Over";
+    for (int i = 0; gameOverText[i] != '\0'; ++i) {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, gameOverText[i]);
+    }
+
+    glFlush();
+}
 
 
 
 void display() {
-    glClear(GL_COLOR_BUFFER_BIT);
+    if (playerBlob.isGameOver())
+        endScreen();
+    else
+    {
 
-    // Render the player blob in a different color (e.g., green)
-    glColor3f(0.0f, 1.0f, 0.0f);  // Green color
-    playerBlob.display();
+    
+        glClear(GL_COLOR_BUFFER_BIT);
 
-    // Render each NPC in the collection with the original color (e.g., blue)
-    glColor3f(0.0f, 0.0f, 1.0f);  // Blue color
-    for (const auto& npc : npcs) {
-        npc.display();
+        // Render the player blob in a different color (e.g., green)
+        glColor3f(0.0f, 1.0f, 0.0f);  // Green color
+        playerBlob.display();
+
+        // Render each NPC in the collection with the original color (e.g., blue)
+        glColor3f(0.0f, 0.0f, 1.0f);  // Blue color
+        for (const auto& npc : npcs) {
+            npc.display();
+        }
+
+        // Draw the timer only if it's not blinking
+        if (!blinkTimer) {
+            drawTimer();
+        }
+
+        glutSwapBuffers();
     }
-
-    // Draw the timer only if it's not blinking
-    if (!blinkTimer) {
-        drawTimer();
-    }
-
-    glutSwapBuffers();
 }
 
 
