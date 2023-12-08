@@ -6,6 +6,7 @@
 #include "npc.h"
 #include "player.h"
 #include <iostream>
+#include <GL/freeglut.h>
 
 player playerBlob(0.0f, 0.0f, 2.0f, 10.0f);  // Provide a value for startSize, e.g., 1.0f
 
@@ -46,47 +47,55 @@ void drawTimer() {
 }
 
 
+// Function to handle the end screen display
 void endScreen()
 {
-    std::cout <<  "end" << std::endl;
-    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
-    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-    //glClear(GL_COLOR_BUFFER_BIT);
-    glColor3f(1.0, 0.0, 0.0); // Red color
+    glLoadIdentity();
 
-    // Position to start drawing the text
-    int x = windowWidth / 2 - 50;
-    int y = windowHeight / 2;
 
-    // Draw each character individually
-    const char* gameOverText = "Game Over";
-    for (int i = 0; gameOverText[i] != '\0'; ++i) {
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, gameOverText[i]);
+    // Display text on the screen
+    glColor3f(1.0f, 1.0f, 1.0f); // Set color to white
+    glRasterPos2f(-0.5, 0.5);
+    glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)"Game Over");
+    glutSwapBuffers();
+}
+
+
+void restartGame() {
+    // Reset relevant game state here
+    elapsedTime = 0;
+    blinkTimer = false;
+    playerBlob.setGameOver(false);
+    initializeNPCs();
+}
+
+void keyboard(unsigned char key, int x, int y) {
+    if (playerBlob.isGameOver())
+    {
+        if (key == 'q' || key == 'Q') {
+            glutLeaveMainLoop();
+        } else if (key == 'r' || key == 'R') {
+            // Restart the game
+            restartGame();
+            glutPostRedisplay();
+        }
     }
-
-    glFlush();
 }
 
 
 
-void display() {
+void display()
+{
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    if (playerBlob.isGameOver())
-    {
-        blinkTimer = true;
-        endScreen();
-    }
-    else
+    glClear(GL_COLOR_BUFFER_BIT);
+    if(!playerBlob.isGameOver())
     {
 
-    
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // Render the player blob in a different color (e.g., green)
+         // Render the player blob in a different color (e.g., green)
         glColor3f(0.0f, 1.0f, 0.0f);  // Green color
         playerBlob.display();
 
-        // Render each NPC in the collection with the original color (e.g., blue)
+            // Render each NPC in the collection with the original color (e.g., blue)
         glColor3f(0.0f, 0.0f, 1.0f);  // Blue color
         for (const auto& npc : npcs) {
             npc.display();
@@ -96,29 +105,35 @@ void display() {
         if (!blinkTimer) {
             drawTimer();
         }
-
         glutSwapBuffers();
+    }
+    else
+    {
+        endScreen();
     }
 }
 
 
 void timer(int value) {
-    // Move each NPC randomly
-    for (auto& npc : npcs) {
-        npc.moveRandomly(16);
+    if (!playerBlob.isGameOver())
+    {
+        // Move each NPC randomly
+        for (auto& npc : npcs) {
+            npc.moveRandomly(16);
+        }
+
+        // Update the elapsed time
+        elapsedTime++;
+
+        // Check if 60 seconds have passed
+        if (elapsedTime >= 60 * 60) {  // 60 seconds * 60 frames per second
+            // Exit the program
+            playerBlob.setGameOver(true);
+        }
+
+        glutPostRedisplay();
+        glutTimerFunc(16, timer, 0);  // 60 FPS update rate
     }
-
-    // Update the elapsed time
-    elapsedTime++;
-
-    // Check if 60 seconds have passed
-    if (elapsedTime >= 60 * 60) {  // 60 seconds * 60 frames per second
-        // Exit the program
-        playerBlob.setGameOver(true);
-    }
-
-    glutPostRedisplay();
-    glutTimerFunc(16, timer, 0);  // 60 FPS update rate
 }
 
 
@@ -135,6 +150,10 @@ void mouseMotion(int x, int y) {
     glutPostRedisplay(); // Trigger a redraw
 }
 
+void idle() {
+    glutPostRedisplay();
+}
+
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -142,10 +161,14 @@ int main(int argc, char** argv) {
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutPassiveMotionFunc(mouseMotion);  // Use passive motion callback to track mouse movement without button press
+    glutKeyboardFunc(keyboard); // use to reset game
+    glutIdleFunc(idle);
+
 
     initializeNPCs();  // Initialize the collection of NPC blobs
 
     glutTimerFunc(0, timer, 0);  // Start the update timer
     srand(static_cast<unsigned>(time(0)));  // Seed the random number generator
     glutMainLoop();
+    return 0;
 }
