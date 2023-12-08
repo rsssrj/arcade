@@ -83,8 +83,9 @@ void player::addBlob(float size)
     float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
     float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
     float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
-    elapsedTime = 0;
+    //elapsedTime = 0;
     npcs.emplace_back(startX, startY, startVelocity, size);
+
 }
 void player::addFood() {
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
@@ -92,7 +93,7 @@ void player::addFood() {
     float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
     float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
     //float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
-    elapsedTime = 0;
+    //elapsedTime = 0;
     food.emplace_back(startX, startY, 0.0f, 4.0f);
 }
 
@@ -111,4 +112,3 @@ void player::setSize(float x)
 {
     size = x;
 }
-
