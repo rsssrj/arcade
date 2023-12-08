@@ -18,15 +18,35 @@ void initializeNPCs() {
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
-    // Create NPC blobs with random positions and velocities
-    for (int i = 0; i < 15; ++i) {
+    // Create NPC blobs with random positions, velocities, and sizes
+    for (int i = 0; i < 90; ++i) {  // Increase the loop count to spawn more NPCs
         float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
         float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
-        float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
-        float startSize = static_cast<float>(rand() % 20 + 5);  // Set the initial size for NPCs
+
+        // Randomly determine whether the NPC has 0 velocity
+        float startVelocity = (rand() % 2 == 0) ? 0.0f : static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
+
+        // Set the initial size for NPCs
+        float startSize;
+
+        if (startVelocity == 0.0f) {
+            // Increase the number of stationary NPCs and decrease their size
+            startSize = static_cast<float>(rand() % 3 + 1);
+        } else {
+            // Decrease the size range for movable NPCs
+            startSize = static_cast<float>(rand() % 15 + 10);  // Adjust the range as needed
+        }
+
         npcs.emplace_back(startX, startY, startVelocity, startSize);
     }
 }
+
+
+
+
+
+
+
 
 void drawTimer() {
     glPushMatrix();
