@@ -11,7 +11,7 @@
 player playerBlob(0.0f, 0.0f, 2.0f, 15.0f); // Provide a value for startSize, e.g., 1.0f
 
 int spawnTimer = 0;          // Timer for spawning NPCs
-int spawnInterval = 5 * 60;  // Spawn a new NPC every 5 seconds (5 * 60 frames per second)
+int spawnInterval = 10 * 60;  // Spawn a new NPC every 5 seconds (5 * 60 frames per second)
 
 int elapsedTime = 0;         // Elapsed time in seconds
 bool blinkTimer = false;      // Flag to control blinking
