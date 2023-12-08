@@ -2,9 +2,11 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include<string>
 #include <cmath>
 #include "npc.h"
 #include "player.h"
+#include <GL/freeglut.h>
 
 
 
@@ -49,30 +51,51 @@ void drawTimer() {
 
 
 
+void endScreen()
+{
+    glLoadIdentity();
+    // Choose a larger font size, e.g., GLUT_BITMAP_HELVETICA_24
 
+    char textString[50]; // Assuming a buffer size of 50 is sufficient
+    sprintf(textString, "Game Over\nScore: %.2f", playerBlob.size);
+    // Display text on the screen
+    glColor3f(0.0f, 0.0f, 0.0f); // Set color to black
+    glRasterPos2f(0.0f, 0.0f);
+    glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)textString);
+    
+}
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
-    
-    // Set the clear color to white (R, G, B, A)
+        
+        // Set the clear color to white (R, G, B, A)
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    
-    // Render the player blob in a different color (e.g., green)
-    glColor3f(0.0f, 1.0f, 0.0f);  // Green color
-    playerBlob.display();
+    if (!playerBlob.isGameOver())
+    {
 
-    // Render each NPC in the collection with the original color (e.g., blue)
-    glColor3f(0.0f, 0.0f, 1.0f);  // Blue color
-    for (const auto& npc : npcs) {
-        npc.display();
+        
+        // Render the player blob in a different color (e.g., green)
+        glColor3f(0.0f, 1.0f, 0.0f);  // Green color
+        playerBlob.display();
+
+        // Render each NPC in the collection with the original color (e.g., blue)
+        glColor3f(0.0f, 0.0f, 1.0f);  // Blue color
+        for (const auto& npc : npcs) {
+            npc.display();
+        }
+
+        // Draw the timer only if it's not blinking
+        if (!blinkTimer) {
+            drawTimer();
+        }
     }
-
-    // Draw the timer only if it's not blinking
-    if (!blinkTimer) {
-        drawTimer();
+    else
+    {
+        endScreen();
     }
 
     glutSwapBuffers();
+
 }
 
 

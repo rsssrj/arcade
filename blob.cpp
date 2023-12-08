@@ -26,6 +26,8 @@ void blob::display() const {
 }
 
 bool blob::checkCollision(const blob& other) const {
+    if (x == other.x || y == other.y)
+        return true;
     float distance = sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
     return distance < (size + other.size);
 }

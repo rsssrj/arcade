@@ -40,7 +40,8 @@ void player::moveMouse(int x, int y) {
         if (it->checkCollision(*this)) {
             if (it->size > size) {
                 // Player blob is eaten by a larger NPC, end the game
-                exit(0);
+                setGameOver(true);
+                break;
             } else {
                 // Player ate the NPC, increase player size by a percentage of NPC size
                 float growthPercentage = 0.1f;  // Adjust this value as needed
@@ -69,4 +70,14 @@ void player::addBlob(float size)
     float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
     elapsedTime = 0;
     npcs.emplace_back(startX, startY, startVelocity, size);
+}
+
+bool player::isGameOver()
+{
+    return gameOver;
+}
+
+void player::setGameOver(bool x)
+{
+    gameOver = x;
 }
