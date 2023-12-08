@@ -25,16 +25,16 @@ void initializeNPCs() {
         float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
         float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
         float startVelocity = 0.0f;  // Stationary NPCs
-        float startSize = static_cast<float>(rand() % 5 + 2);  // Small size for stationary NPCs
-        npcs.emplace_back(startX, startY, startVelocity, startSize);
+        const float startSize = 4.0f;  // Small size for stationary NPCs
+        food.emplace_back(startX, startY, startVelocity, startSize);
     }
 
     // Create NPC blobs with random positions and velocities
-    for (int i = 0; i < 15; ++i) {
+    for (int i = 0; i < 35; ++i) {
         float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
         float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
-        float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
-        float startSize = static_cast<float>(rand() % 20 + 5);  // Set the initial size for NPCs
+        float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 3.0f + 2.0f;
+        float startSize = static_cast<float>(rand() % 40 + 10);  // Set the initial size for NPCs
         npcs.emplace_back(startX, startY, startVelocity, startSize);
     }
 }
@@ -69,6 +69,7 @@ void restartGame()
 {
     playerBlob.setSize(15.0f);
     npcs.clear();
+    food.clear();
     elapsedTime = 0;
     initializeNPCs();
     playerBlob.setGameOver(false);
@@ -118,6 +119,10 @@ void display() {
     if (!playerBlob.isGameOver()) {
         glColor3f(0.0f, 0.0f, 1.0f);  // Blue color
         for (const auto& npc : npcs) {
+            npc.display();
+        }
+
+        for (const auto& npc : food) {
             npc.display();
         }
 
@@ -177,14 +182,6 @@ void timer(int value) {
     glutTimerFunc(16, timer, 0);  // 60 FPS update rate
 }
 
-
-
-
-
-
-
-
-
 void reshape(int width, int height) {
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
@@ -217,3 +214,4 @@ int main(int argc, char** argv) {
     srand(static_cast<unsigned>(time(0)));
     glutMainLoop();
 }
+
