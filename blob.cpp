@@ -32,4 +32,3 @@ bool blob::checkCollision(const blob& other) const {
     return distance < (size + other.size);
 }
 
-
