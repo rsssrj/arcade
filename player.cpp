@@ -62,7 +62,7 @@ void player::moveMouse(int x, int y) {
             size += it->size * growthPercentage;
             
             // Remove the eaten NPC from the collection
-                addBlob(it->size * 1.25);
+                addFood();
                 it = food.erase(it);
         } 
         

@@ -111,12 +111,13 @@ void display() {
     // Set the clear color to white (R, G, B, A)
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     
-    // Render the player blob in a different color (e.g., green)
-    glColor3f(0.0f, 1.0f, 0.0f);  // Green color
-    playerBlob.display();
+
 
     // Render each NPC in the collection with the original color (e.g., blue)
     if (!playerBlob.isGameOver()) {
+            // Render the player blob in a different color (e.g., green)
+        glColor3f(0.0f, 1.0f, 0.0f);  // Green color
+        playerBlob.display();
         glColor3f(0.0f, 0.0f, 1.0f);  // Blue color
         for (const auto& npc : npcs) {
             npc.display();
