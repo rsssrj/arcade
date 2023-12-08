@@ -55,4 +55,3 @@ void NPC::moveRandomly(player& playerBlob, int deltaTime) {
         }
     }
 }
-
