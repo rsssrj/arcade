@@ -1,4 +1,5 @@
 #include <GL/glut.h>
+#include <GL/freeglut.h>
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -8,15 +9,12 @@
 
 
 
-player playerBlob(0.0f, 0.0f, 2.0f, 15.0f); // Provide a value for startSize, e.g., 1.0f
+player playerBlob(0.0f, 0.0f, 2.0f, 15.0f); // Provide a value for startSize
 
-int spawnTimer = 0;          // Timer for spawning NPCs
-int spawnInterval = 10 * 60;  // Spawn a new NPC every 5 seconds (5 * 60 frames per second)
 
 int elapsedTime = 0;         // Elapsed time in seconds
 bool blinkTimer = false;      // Flag to control blinking
 int blinkDuration = 10;        // Duration of blinking in seconds
-int totalGameTime = 10*60;  // Total game time in seconds
 
 void initializeNPCs() {
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
@@ -27,16 +25,16 @@ void initializeNPCs() {
         float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
         float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
         float startVelocity = 0.0f;  // Stationary NPCs
-        float startSize = static_cast<float>(rand() % 5 + 2);  // Small size for stationary NPCs
-        npcs.emplace_back(startX, startY, startVelocity, startSize);
+        const float startSize = 4.0f;  // Small size for stationary NPCs
+        food.emplace_back(startX, startY, startVelocity, startSize);
     }
 
     // Create NPC blobs with random positions and velocities
-    for (int i = 0; i < 15; ++i) {
+    for (int i = 0; i < 35; ++i) {
         float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
         float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
         float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
-        float startSize = static_cast<float>(rand() % 20 + 5);  // Set the initial size for NPCs
+        float startSize = static_cast<float>(rand() % 40 + 10);  // Set the initial size for NPCs
         npcs.emplace_back(startX, startY, startVelocity, startSize);
     }
 }
@@ -53,7 +51,7 @@ void drawTimer() {
 
     // Draw the dynamic part of the timer text (counting backward)
     char timerText[10];
-    sprintf(timerText, "%02d:%02d", totalGameTime / 60, totalGameTime - (elapsedTime % 60));
+    sprintf(timerText, "%01d:%02d", (0 - elapsedTime / 60), 59 - (elapsedTime % 60));
     for (int i = 0; i < strlen(timerText); i++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, timerText[i]);
     }
@@ -62,7 +60,42 @@ void drawTimer() {
 }
 
 
+void restartGame()
+{
+    playerBlob.setSize(15.0f);
+    npcs.clear();
+    food.clear();
+    elapsedTime = 0;
+    initializeNPCs();
+    playerBlob.setGameOver(false);
 
+
+}
+
+void keyboard(unsigned char key, int x, int y) {
+    if (playerBlob.isGameOver() && key == 'r') {
+        restartGame();
+        glutPostRedisplay(); // Trigger a redraw to update the display
+    }
+        if (playerBlob.isGameOver() && key == 'q') {
+        exit(0);
+    }
+}
+
+void endScreen()
+{
+    glLoadIdentity();
+    // Choose a larger font size, e.g., GLUT_BITMAP_HELVETICA_24
+
+    char textString[100]; // Assuming a buffer size of 50 is sufficient
+    sprintf(textString, "Game Over\n Press 'R' to Restart and 'Q' to quit\nScore: %.2f", playerBlob.size);
+    // Display text on the screen
+    glColor3f(0.0f, 0.0f, 0.0f); // Set color to black
+    glRasterPos2f(0.0f, 0.0f);
+    glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)textString);
+
+    
+}
 
 
 
@@ -73,19 +106,30 @@ void display() {
     // Set the clear color to white (R, G, B, A)
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     
-    // Render the player blob in a different color (e.g., green)
-    glColor3f(0.0f, 1.0f, 0.0f);  // Green color
-    playerBlob.display();
+
 
     // Render each NPC in the collection with the original color (e.g., blue)
-    glColor3f(0.0f, 0.0f, 1.0f);  // Blue color
-    for (const auto& npc : npcs) {
-        npc.display();
-    }
+    if (!playerBlob.isGameOver()) {
+            // Render the player blob in a different color (e.g., green)
+        glColor3f(0.0f, 1.0f, 0.0f);  // Green color
+        playerBlob.display();
+        glColor3f(0.0f, 0.0f, 1.0f);  // Blue color
+        for (const auto& npc : npcs) {
+            npc.display();
+        }
 
-    // Draw the timer only if it's not blinking
-    if (!blinkTimer) {
-        drawTimer();
+        for (const auto& npc : food) {
+            npc.display();
+        }
+
+        // Draw the timer only if it's not blinking
+        if (!blinkTimer) {
+            drawTimer();
+        }
+    }
+    
+    else {
+        endScreen();
     }
 
     glutSwapBuffers();
@@ -99,38 +143,45 @@ void timer(int value) {
     for (auto& npc : npcs) {
         npc.moveRandomly(playerBlob, 16);
 
-        // Check for collisions with other NPCs
-        for (auto& otherNPC : npcs) {
-            if (&otherNPC != &npc && npc.checkCollision(otherNPC)) {
-                if (npc.size > otherNPC.size) {
-                    // This NPC ate the other NPC
-                    npc.size += otherNPC.size * 0.5f;  // Adjust the growth percentage
-                    otherNPC.size = 0;  // Mark the other NPC as eaten
-                    elapsedTime = 0;  // Reset the timer when NPC is eaten
-                    totalGameTime = 10 * 60;  // Reset totalGameTime to 10 seconds
-
-                    
-                } else if (npc.size < otherNPC.size) {
-                    // This NPC got eaten by the other NPC
-                    otherNPC.size += npc.size * 0.5f;  // Adjust the growth percentage
-                    npc.size = 0;  // Mark this NPC as eaten
+        // Check for collisions with the player blob
+        if (playerBlob.checkCollision(npc)) {
+            if (playerBlob.size > npc.size) {
+                // The player blob ate the NPC
+                if (npc.velocity > 0.0f) {
+                    // Movable NPC
+                    playerBlob.size += npc.size * 0.5f;  // Adjust the growth percentage
+                    npc.size = 0;  // Mark the NPC as eaten
+                    elapsedTime = 10 * 60;  // Reset the timer to 10 seconds
+                } else {
+                    // Stationary NPC
+                    playerBlob.size += npc.size * 0.7f;  // Adjust the growth percentage for stationary NPCs
+                    npc.size = 0;  // Mark the NPC as eaten
                 }
+            } else {
+                // The NPC ate the player blob
+                playerBlob.setGameOver(true);
+                return;  // Exit the function to avoid further processing
             }
         }
     }
 
+    // Check if it's time to spawn a new NPC (every 10 seconds)
+    if (elapsedTime % (10 * 60) == 0) {
+        int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+        int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+        float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
+        float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
+        float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
+        float startSize = static_cast<float>(rand() % 40 + 10);
+        npcs.emplace_back(startX, startY, startVelocity, startSize);
+    }
+
     // Update the elapsed time
-    elapsedTime++;
+    elapsedTime--;
 
     // Check if the player has eaten an NPC
     if (npcs.empty()) {
         // Exit the program if there are no more NPCs
-        exit(0);
-    }
-
-    // Check if the time has run out
-    if (elapsedTime >= totalGameTime) {
-        // Exit the program if no NPC was eaten within the time limit
         exit(0);
     }
 
@@ -167,6 +218,7 @@ int main(int argc, char** argv) {
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutPassiveMotionFunc(mouseMotion);
+    glutKeyboardFunc(keyboard); // Register the keyboard function
 
     initializeNPCs();
 
@@ -174,3 +226,4 @@ int main(int argc, char** argv) {
     srand(static_cast<unsigned>(time(0)));
     glutMainLoop();
 }
+

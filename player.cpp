@@ -8,6 +8,7 @@ const float initialSize = 1.0f;  // Initial size of the player blob
 
 // Declare the npcs vector
 std::vector<NPC> npcs;
+std::vector<NPC> food;
 
 void player::moveMouse(int x, int y) {
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
@@ -39,18 +40,33 @@ void player::moveMouse(int x, int y) {
     for (auto it = npcs.begin(); it != npcs.end();) {
         if (it->checkCollision(*this)) {
             if (it->size > size) {
-                // Player blob is eaten by a larger NPC, end the game
-                exit(0);
+                setGameOver(true);
+                break;
             } else {
                 // Player ate the NPC, increase player size by a percentage of NPC size
                 float growthPercentage = 0.1f;  // Adjust this value as needed
                 size += it->size * growthPercentage;
 
                 // Remove the eaten NPC from the collection
-                addBlob(it->size * 1.25);
+                addBlob(size * 1.25);
                 it = npcs.erase(it);
             }
         } else {
+            ++it; // Move to the next NPC
+        }
+    }
+
+    for (auto it = food.begin(); it != food.end();) {
+        if (it->checkCollision(*this)) {
+            float growthPercentage = 0.1f;  // Adjust this value as needed
+            size += it->size * growthPercentage;
+            
+            // Remove the eaten NPC from the collection
+                addFood();
+                it = food.erase(it);
+        } 
+        
+        else {
             ++it; // Move to the next NPC
         }
     }
@@ -69,4 +85,30 @@ void player::addBlob(float size)
     float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
     elapsedTime = 0;
     npcs.emplace_back(startX, startY, startVelocity, size);
+
+}
+void player::addFood() {
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
+    float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
+    //float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
+    elapsedTime = 0;
+    food.emplace_back(startX, startY, 0.0f, 4.0f);
+}
+
+bool player::isGameOver()
+{
+    return gameOver;
+}
+
+void player::setGameOver(bool x)
+{
+    gameOver = x;
+}
+
+
+void player::setSize(float x)
+{
+    size = x;
 }

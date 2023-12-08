@@ -6,6 +6,7 @@
 
 // Declare the extern variables in the header
 extern std::vector<NPC> npcs;
+extern std::vector<NPC> food;
 extern int elapsedTime;
 
 class player : public blob {
@@ -16,7 +17,12 @@ public:
     // Function to handle player movement based on mouse input
     void moveMouse(int x, int y);
     void addBlob(float size);
+    bool isGameOver();
+    void setGameOver(bool x);
+    void setSize(float x);
+    void addFood();
+private: 
+    bool gameOver = false;
 };
 
 #endif // PLAYER_H
-
