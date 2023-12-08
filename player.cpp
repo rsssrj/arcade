@@ -112,3 +112,4 @@ void player::setSize(float x)
 {
     size = x;
 }
+
