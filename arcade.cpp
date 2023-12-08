@@ -10,41 +10,36 @@
 
 player playerBlob(0.0f, 0.0f, 2.0f, 15.0f); // Provide a value for startSize, e.g., 1.0f
 
+int spawnTimer = 0;          // Timer for spawning NPCs
+int spawnInterval = 5 * 60;  // Spawn a new NPC every 5 seconds (5 * 60 frames per second)
+
 int elapsedTime = 0;         // Elapsed time in seconds
 bool blinkTimer = false;      // Flag to control blinking
 int blinkDuration = 10;        // Duration of blinking in seconds
+int totalGameTime = 10*60;  // Total game time in seconds
 
 void initializeNPCs() {
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
-    // Create NPC blobs with random positions, velocities, and sizes
-    for (int i = 0; i < 90; ++i) {  // Increase the loop count to spawn more NPCs
+    // Create stationary small NPCs
+    for (int i = 0; i < 100; ++i) {
         float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
         float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
+        float startVelocity = 0.0f;  // Stationary NPCs
+        float startSize = static_cast<float>(rand() % 5 + 2);  // Small size for stationary NPCs
+        npcs.emplace_back(startX, startY, startVelocity, startSize);
+    }
 
-        // Randomly determine whether the NPC has 0 velocity
-        float startVelocity = (rand() % 2 == 0) ? 0.0f : static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
-
-        // Set the initial size for NPCs
-        float startSize;
-
-        if (startVelocity == 0.0f) {
-            // Increase the number of stationary NPCs and decrease their size
-            startSize = static_cast<float>(rand() % 3 + 1);
-        } else {
-            // Decrease the size range for movable NPCs
-            startSize = static_cast<float>(rand() % 15 + 10);  // Adjust the range as needed
-        }
-
+    // Create NPC blobs with random positions and velocities
+    for (int i = 0; i < 15; ++i) {
+        float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
+        float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
+        float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
+        float startSize = static_cast<float>(rand() % 20 + 5);  // Set the initial size for NPCs
         npcs.emplace_back(startX, startY, startVelocity, startSize);
     }
 }
-
-
-
-
-
 
 
 
@@ -58,13 +53,14 @@ void drawTimer() {
 
     // Draw the dynamic part of the timer text (counting backward)
     char timerText[10];
-    sprintf(timerText, "%01d:%02d", (60 - elapsedTime / 60), 59 - (elapsedTime % 60));
+    sprintf(timerText, "%02d:%02d", totalGameTime / 60, totalGameTime - (elapsedTime % 60));
     for (int i = 0; i < strlen(timerText); i++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, timerText[i]);
     }
 
     glPopMatrix();
 }
+
 
 
 
@@ -97,6 +93,7 @@ void display() {
 
 
 
+// Update the timer function
 void timer(int value) {
     // Move each NPC randomly and check for collisions
     for (auto& npc : npcs) {
@@ -109,6 +106,10 @@ void timer(int value) {
                     // This NPC ate the other NPC
                     npc.size += otherNPC.size * 0.5f;  // Adjust the growth percentage
                     otherNPC.size = 0;  // Mark the other NPC as eaten
+                    elapsedTime = 0;  // Reset the timer when NPC is eaten
+                    totalGameTime = 10 * 60;  // Reset totalGameTime to 10 seconds
+
+                    
                 } else if (npc.size < otherNPC.size) {
                     // This NPC got eaten by the other NPC
                     otherNPC.size += npc.size * 0.5f;  // Adjust the growth percentage
@@ -121,21 +122,23 @@ void timer(int value) {
     // Update the elapsed time
     elapsedTime++;
 
-    // Check if 10 seconds have passed
-    if (elapsedTime >= 10 * 60) {  // 10 seconds * 60 frames per second
-        // Exit the program
-        exit(0);
-    }
-
     // Check if the player has eaten an NPC
     if (npcs.empty()) {
         // Exit the program if there are no more NPCs
         exit(0);
     }
 
+    // Check if the time has run out
+    if (elapsedTime >= totalGameTime) {
+        // Exit the program if no NPC was eaten within the time limit
+        exit(0);
+    }
+
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);  // 60 FPS update rate
 }
+
+
 
 
 
