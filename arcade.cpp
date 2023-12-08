@@ -51,7 +51,7 @@ void drawTimer() {
 
     // Draw the dynamic part of the timer text (counting backward)
     char timerText[10];
-    sprintf(timerText, "%01d:%02d", (60 - elapsedTime / 60), 59 - (elapsedTime % 60));
+    sprintf(timerText, "%01d:%02d", (20 - elapsedTime / 20), 19 - (elapsedTime % 20));
     for (int i = 0; i < strlen(timerText); i++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, timerText[i]);
     }
@@ -154,7 +154,7 @@ void timer(int value) {
                     //elapsedTime = 10 * 60;  // Reset the timer to 10 seconds
                 } else {
                     // Stationary NPC
-                    playerBlob.size += npc.size * 1.2f;  // Adjust the growth percentage for stationary NPCs
+                    playerBlob.size += npc.size * 2.0f;  // Adjust the growth percentage for stationary NPCs
                     npc.size = 0;  // Mark the NPC as eaten
                 }
             } else {
@@ -166,8 +166,8 @@ void timer(int value) {
     }
 
 
-    // Check if it's time to spawn a new NPC (every 2 seconds)
-    if (elapsedTime % (1 * 60) == 0 && elapsedTime != 0) {
+    // Check if it's time to spawn a new NPC (every 1 second)
+    if (elapsedTime % (1 * 20) == 0 && elapsedTime != 0) {
         int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
         int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
         float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
@@ -227,4 +227,3 @@ int main(int argc, char** argv) {
     srand(static_cast<unsigned>(time(0)));
     glutMainLoop();
 }
-
