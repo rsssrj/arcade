@@ -9,7 +9,7 @@
 
 
 
-player playerBlob(0.0f, 0.0f, 2.0f, 15.0f); // Provide a value for startSize, e.g., 1.0f
+player playerBlob(0.0f, 0.0f, 2.0f, 15.0f); // Provide a value for startSize
 
 
 int elapsedTime = 0;         // Elapsed time in seconds
@@ -30,10 +30,10 @@ void initializeNPCs() {
     }
 
     // Create NPC blobs with random positions and velocities
-    for (int i = 0; i < 35; ++i) {
+    for (int i = 0; i < 55; ++i) {
         float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
         float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
-        float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 3.0f + 2.0f;
+        float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
         float startSize = static_cast<float>(rand() % 40 + 10);  // Set the initial size for NPCs
         npcs.emplace_back(startX, startY, startVelocity, startSize);
     }
@@ -58,11 +58,6 @@ void drawTimer() {
 
     glPopMatrix();
 }
-
-
-
-
-
 
 
 void restartGame()
@@ -148,40 +143,57 @@ void timer(int value) {
     for (auto& npc : npcs) {
         npc.moveRandomly(playerBlob, 16);
 
-        // Check for collisions with other NPCs
-        for (auto& otherNPC : npcs) {
-            if (&otherNPC != &npc && npc.checkCollision(otherNPC)) {
-                if (npc.size > otherNPC.size) {
-                    // This NPC ate the other NPC
-                    npc.size += otherNPC.size * 0.5f;  // Adjust the growth percentage
-                    otherNPC.size = 0;  // Mark the other NPC as eaten
-                } else if (npc.size < otherNPC.size) {
-                    // This NPC got eaten by the other NPC
-                    otherNPC.size += npc.size * 0.5f;  // Adjust the growth percentage
-                    npc.size = 0;  // Mark this NPC as eaten
+        // Check for collisions with the player blob
+        if (playerBlob.checkCollision(npc)) {
+            if (playerBlob.size > npc.size) {
+                // The player blob ate the NPC
+                if (npc.velocity > 0.0f) {
+                    // Movable NPC
+                    playerBlob.size += npc.size * 0.5f;  // Adjust the growth percentage
+                    npc.size = 0;  // Mark the NPC as eaten
+                    //elapsedTime = 10 * 60;  // Reset the timer to 10 seconds
+                } else {
+                    // Stationary NPC
+                    playerBlob.size += npc.size * 1.2f;  // Adjust the growth percentage for stationary NPCs
+                    npc.size = 0;  // Mark the NPC as eaten
                 }
+            } else {
+                // The NPC ate the player blob
+                playerBlob.setGameOver(true);
+                return;  // Exit the function to avoid further processing
             }
         }
     }
 
+
+    // Check if it's time to spawn a new NPC (every 2 seconds)
+    if (elapsedTime % (1 * 60) == 0 && elapsedTime != 0) {
+        int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+        int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+        float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
+        float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
+        float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 3.0f + 2.0f;
+        float startSize = static_cast<float>(rand() % 40 + 10);
+        npcs.emplace_back(startX, startY, startVelocity, startSize);
+    }
+
+    
     // Update the elapsed time
     elapsedTime++;
 
-    // Check if 10 seconds have passed
-    if (elapsedTime >= 10 * 60) {  // 10 seconds * 60 frames per second
-        // Exit the program
-        exit(0);
-    }
-
     // Check if the player has eaten an NPC
     if (npcs.empty()) {
-        // Exit the program if there are no more NPCs
-        exit(0);
+        playerBlob.setGameOver(true);
     }
 
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);  // 60 FPS update rate
 }
+
+
+
+
+
 
 void reshape(int width, int height) {
     glViewport(0, 0, width, height);
