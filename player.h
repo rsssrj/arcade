@@ -18,6 +18,7 @@ public:
     void addBlob(float size);
     bool isGameOver();
     void setGameOver(bool x);
+    void setSize(float x);
 private: 
     bool gameOver = false;
 };

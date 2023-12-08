@@ -81,3 +81,9 @@ void player::setGameOver(bool x)
 {
     gameOver = x;
 }
+
+
+void player::setSize(float x)
+{
+    size = x;
+}

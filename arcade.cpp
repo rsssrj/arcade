@@ -49,19 +49,39 @@ void drawTimer() {
 }
 
 
+void restartGame()
+{
+    playerBlob.setSize(15.0f);
+    npcs.clear();
+    elapsedTime = 0;
+    initializeNPCs();
+    playerBlob.setGameOver(false);
 
+
+}
+
+void keyboard(unsigned char key, int x, int y) {
+    if (playerBlob.isGameOver() && key == 'r') {
+        restartGame();
+        glutPostRedisplay(); // Trigger a redraw to update the display
+    }
+        if (playerBlob.isGameOver() && key == 'q') {
+        exit(0);
+    }
+}
 
 void endScreen()
 {
     glLoadIdentity();
     // Choose a larger font size, e.g., GLUT_BITMAP_HELVETICA_24
 
-    char textString[50]; // Assuming a buffer size of 50 is sufficient
-    sprintf(textString, "Game Over\nScore: %.2f", playerBlob.size);
+    char textString[100]; // Assuming a buffer size of 50 is sufficient
+    sprintf(textString, "Game Over\n Press 'R' to Restart and 'Q' to quit\nScore: %.2f", playerBlob.size);
     // Display text on the screen
     glColor3f(0.0f, 0.0f, 0.0f); // Set color to black
     glRasterPos2f(0.0f, 0.0f);
     glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)textString);
+
     
 }
 
@@ -167,6 +187,7 @@ int main(int argc, char** argv) {
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutPassiveMotionFunc(mouseMotion);
+    glutKeyboardFunc(keyboard); // Register the keyboard function
 
     initializeNPCs();
 
