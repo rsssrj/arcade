@@ -14,7 +14,7 @@ private:
 public:
     NPC(float startX, float startY, float startVelocity, float startSize)
         : blob(startX, startY, startVelocity, startSize) {
-        moveDuration = rand() % 17000 + 3000;
+        moveDuration = rand() % 12000 + 2000;
         moveTimer = 0;
     }
 

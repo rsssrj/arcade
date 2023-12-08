@@ -8,11 +8,11 @@
 
 
 
-player playerBlob(0.0f, 0.0f, 2.0f, 10.0f); // Provide a value for startSize, e.g., 1.0f
+player playerBlob(0.0f, 0.0f, 2.0f, 15.0f); // Provide a value for startSize, e.g., 1.0f
 
 int elapsedTime = 0;         // Elapsed time in seconds
 bool blinkTimer = false;      // Flag to control blinking
-int blinkDuration = 3;        // Duration of blinking in seconds
+int blinkDuration = 10;        // Duration of blinking in seconds
 
 void initializeNPCs() {
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
@@ -53,7 +53,10 @@ void drawTimer() {
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
-
+    
+    // Set the clear color to white (R, G, B, A)
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    
     // Render the player blob in a different color (e.g., green)
     glColor3f(0.0f, 1.0f, 0.0f);  // Green color
     playerBlob.display();
@@ -71,6 +74,7 @@ void display() {
 
     glutSwapBuffers();
 }
+
 
 
 void timer(int value) {
@@ -94,19 +98,26 @@ void timer(int value) {
         }
     }
 
-
     // Update the elapsed time
     elapsedTime++;
 
-    // Check if 60 seconds have passed
-    if (elapsedTime >= 60 * 60) {  // 60 seconds * 60 frames per second
+    // Check if 10 seconds have passed
+    if (elapsedTime >= 10 * 60) {  // 10 seconds * 60 frames per second
         // Exit the program
+        exit(0);
+    }
+
+    // Check if the player has eaten an NPC
+    if (npcs.empty()) {
+        // Exit the program if there are no more NPCs
         exit(0);
     }
 
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);  // 60 FPS update rate
 }
+
+
 
 
 void reshape(int width, int height) {

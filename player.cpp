@@ -43,7 +43,7 @@ void player::moveMouse(int x, int y) {
                 exit(0);
             } else {
                 // Player ate the NPC, increase player size by a percentage of NPC size
-                float growthPercentage = 0.15f;  // Adjust this value as needed
+                float growthPercentage = 0.1f;  // Adjust this value as needed
                 size += it->size * growthPercentage;
 
                 // Remove the eaten NPC from the collection
@@ -67,6 +67,6 @@ void player::addBlob(float size)
     float startX = static_cast<float>(rand() % windowWidth - windowWidth / 2);
     float startY = static_cast<float>(rand() % windowHeight - windowHeight / 2);
     float startVelocity = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f + 1.0f;
+    elapsedTime = 0;
     npcs.emplace_back(startX, startY, startVelocity, size);
 }
-

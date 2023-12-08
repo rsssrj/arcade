@@ -33,7 +33,7 @@ void NPC::moveRandomly(player& playerBlob, int deltaTime) {
     }
 
     // Increase the speed of the NPCs by adjusting the velocity
-    float speedMultiplier = 2.0f;  // You can adjust this multiplier as needed
+    float speedMultiplier = 3.0f;  // You can adjust this multiplier as needed
     float deltaX = speedMultiplier * velocity * cosf(randomAngle);
     float deltaY = speedMultiplier * velocity * sinf(randomAngle);
 

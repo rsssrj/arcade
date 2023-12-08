@@ -4,8 +4,9 @@
 #include "blob.h"
 #include "npc.h"  // Include the header file for NPC
 
-// Declare the extern variable in the header
+// Declare the extern variables in the header
 extern std::vector<NPC> npcs;
+extern int elapsedTime;
 
 class player : public blob {
 public:
@@ -18,3 +19,4 @@ public:
 };
 
 #endif // PLAYER_H
+
